@@ -1,6 +1,7 @@
 from flask import Blueprint , abort , jsonify
 from core import db
 from core.apis import decorators
+from core.libs.exceptions import FyleError
 from core.apis.responses import APIResponse
 from core.models.assignments import Assignment
 
@@ -48,4 +49,5 @@ def submit_assignment(p, incoming_payload):
         submitted_assignment_dump = AssignmentSchema().dump(assignment)
         return APIResponse.respond(data=submitted_assignment_dump)
     else:
-        return jsonify({"error" :"FyleError" , "message" : "only a draft assignment can be submitted"}),400
+        error_message = "only a draft assignment can be submitted"
+        raise FyleError(400 , error_message)

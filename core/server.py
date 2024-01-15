@@ -47,22 +47,6 @@ def handle_error(err):
 
 #APIS
 
-class AuthPrincipal:
-    def __init__(self , user_id , student_id=None , teacher_id=None, principal_id=None):
-        self.user_id = user_id
-        self.student_id = student_id
-        self.teacher_id = teacher_id
-        self.principal_id= principal_id
-
-#decorators to check if principal is authenticated...
-@authenticate_principal
-def principal_required(func):
-    def wrapper(p , *args , **kwargs):
-        return func(p , *args , **kwargs)
-    return wrapper
-
-
-
 #GET /pricipal/teachers
 @app.route('/principal/teachers', methods=["GET"])
 @authenticate_principal
@@ -126,6 +110,3 @@ def grade_or_regrade_assignment(p):
         )
     else:
         return jsonify({"error": "Assignment IN DRAFT STATE or NOT Found"}) , 400
-
-if __name__ == '__main__':
-    app.run(debug=True)
