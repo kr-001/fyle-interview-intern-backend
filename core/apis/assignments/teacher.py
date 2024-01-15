@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, jsonify
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
@@ -13,6 +13,8 @@ teacher_assignments_resources = Blueprint('teacher_assignments_resources', __nam
 def list_assignments(p):
     """Returns list of assignments"""
     teachers_assignments = Assignment.get_assignments_by_teacher(p.teacher_id)
+    #State = DRAFT 
+    teachers_assignments = [assignment for assignment in teachers_assignments if assignment.state != "DRAFT"]
     teachers_assignments_dump = AssignmentSchema().dump(teachers_assignments, many=True)
     return APIResponse.respond(data=teachers_assignments_dump)
 
@@ -23,7 +25,12 @@ def list_assignments(p):
 def grade_assignment(p, incoming_payload):
     """Grade an assignment"""
     grade_assignment_payload = AssignmentGradeSchema().load(incoming_payload)
-
+    #Assignment ID
+    assignment = Assignment.get_by_id(grade_assignment_payload.id)
+    if not assignment:
+        return jsonify({"error" : "FyleError"}) , 404
+    if assignment.teacher_id != p.teacher_id:
+        return jsonify({"error" : "FyleError"}) , 400
     graded_assignment = Assignment.mark_grade(
         _id=grade_assignment_payload.id,
         grade=grade_assignment_payload.grade,
