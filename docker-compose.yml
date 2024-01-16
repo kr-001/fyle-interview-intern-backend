@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "7755:5000"  # Map the host port to the container port
+    environment:
+      - FLASK_APP=core/server.py
+    command: gunicorn -w 4 -b 0.0.0.0:5000 core.server:app
+    volumes:
+      - ./data:/app/data  
